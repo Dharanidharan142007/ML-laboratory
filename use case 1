@@ -1,0 +1,49 @@
+def candidate_elimination(training_data, attributes):
+    # Initialize S (specific boundary) with first positive example
+    for example in training_data:
+        if example[-1] == "Yes":
+            S = example[:-1]
+            break
+    
+    # Initialize G (general boundary) with most general hypothesis
+    G = [["?" for _ in range(len(attributes))]]
+    
+    for example in training_data:
+        x, y = example[:-1], example[-1]
+        
+        if y == "Yes":  # Positive example
+            for i in range(len(S)):
+                if S[i] != x[i]:
+                    S[i] = "?"
+            # Remove inconsistent hypotheses from G
+            G = [g for g in G if all(g[i] == "?" or g[i] == x[i] for i in range(len(x)))]
+        
+        else:  # Negative example
+            new_G = []
+            for g in G:
+                for i in range(len(x)):
+                    if g[i] == "?":
+                        if S[i] != x[i]:
+                            new_hypothesis = g.copy()
+                            new_hypothesis[i] = S[i]
+                            new_G.append(new_hypothesis)
+            G = new_G
+    
+    return S, G
+
+
+# Attributes
+attributes = ["Fever", "Cough", "Fatigue"]
+
+# Training data: [Fever, Cough, Fatigue, Disease]
+training_data = [
+    ["Yes", "Yes", "Yes", "Yes"],
+    ["Yes", "No", "Yes", "Yes"],
+    ["No", "Yes", "Yes", "No"],
+    ["Yes", "Yes", "No", "Yes"]
+]
+
+S, G = candidate_elimination(training_data, attributes)
+
+print("Final Specific Boundary (S):", S)
+print("Final General Boundary (G):", G)
