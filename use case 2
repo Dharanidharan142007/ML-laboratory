@@ -1,0 +1,49 @@
+import math
+
+# Toy dataset
+dataset = [
+    {'Fever':'Yes','Cough':'Yes','Fatigue':'Yes','Age':'Young','Disease':'Yes'},
+    {'Fever':'Yes','Cough':'No','Fatigue':'No','Age':'Adult','Disease':'Yes'},
+    {'Fever':'No','Cough':'Yes','Fatigue':'No','Age':'Senior','Disease':'No'},      
+]
+
+# Entropy
+def entropy(data):
+    labels = [row['Disease'] for row in data]
+    total = len(labels)
+    return sum([-(labels.count(val)/total)*math.log2(labels.count(val)/total) 
+                for val in set(labels)])
+
+# Info Gain
+def info_gain(data, attr):
+    total_entropy = entropy(data)
+    vals = set([row[attr] for row in data])
+    weighted = 0
+    for v in vals:
+        subset = [row for row in data if row[attr]==v]
+        weighted += (len(subset)/len(data))*entropy(subset)
+    return total_entropy - weighted
+
+# ID3 (simplified)
+def id3(data, attrs):
+    labels = [row['Disease'] for row in data]
+    if labels.count(labels[0]) == len(labels):
+        return labels[0]
+    if not attrs:
+        return max(set(labels), key=labels.count)
+    gains = {attr: info_gain(data, attr) for attr in attrs}
+    best = max(gains, key=gains.get)
+    tree = {best:{}}
+    for v in set([row[best] for row in data]):
+        subset = [row for row in data if row[best]==v]
+        tree[best][v] = id3(subset, [a for a in attrs if a!=best])
+    return tree
+
+# Run
+tree = id3(dataset, ['Fever','Cough','Fatigue','Age'])
+print("Decision Tree:")
+print(tree)
+
+output:
+Decision Tree:
+{'Fever': {'No': 'No', 'Yes': 'Yes'}}
