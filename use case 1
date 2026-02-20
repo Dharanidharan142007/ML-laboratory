@@ -47,3 +47,8 @@ S, G = candidate_elimination(training_data, attributes)
 
 print("Final Specific Boundary (S):", S)
 print("Final General Boundary (G):", G)
+
+
+output:
+Final Specific Boundary (S): ['Yes', '?', '?']
+Final General Boundary (G): [['Yes', '?', '?'], ['?', '?', '?']]
